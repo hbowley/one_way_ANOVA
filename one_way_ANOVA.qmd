@@ -32,6 +32,15 @@ anova %>%
   gt()
 ```
 
+### Visualize the ANOVA
+
+```{r}
+#| echo: true
+headache %>% 
+  ggplot(aes(treatment, pain_score)) + 
+  geom_boxplot()
+```
+
 ### Calculate the observed statistic 
 
 ```{r}
