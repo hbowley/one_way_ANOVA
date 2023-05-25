@@ -1,26 +1,82 @@
 ---
 title: "One way ANOVA"
+author:
+  - name: Hannah Bowley
+  - name: Micaela Lembo
 format: html
+toc: true
 editor: visual
+theme: lux
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+### Load in Libraries
 
 ```{r}
-1 + 1
+#| echo: true
+#| message: false
+#| warning: false
+library(tidymodels)
+library(datarium)
+library(gt)
 ```
 
-You can add options to executable code like this
+### Calculate one way ANOVA using base R
 
 ```{r}
-#| echo: false
-2 * 2
+## Use AOV function to calculate 
+anova <-aov(pain_score ~ treatment, data = headache)
+
+## Tidy ANOVA output and create a gt table 
+anova %>% 
+  tidy() %>% 
+  gt()
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+### Calculate the observed statistic 
+
+```{r}
+#| echo: true 
+## Calculate the observed statistic
+observed_f_statistic <- headache %>% 
+  specify(pain_score ~ treatment) %>% 
+  hypothesize(null = "independence") %>% 
+  calculate(stat = "F")
+
+observed_f_statistic
+```
+
+### Calculate the Null Distribution Simulation 
+
+```{r}
+#| echo: true
+## generate the null distribution using randomization
+
+null_distribution <- headache %>% 
+  specify(pain_score ~ treatment) %>% 
+  hypothesize(null = "independence") %>% 
+  generate(reps = 1000, type = "permute") %>% 
+  calculate(stat = "F")
+```
+
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+null_distribution %>% 
+  visualize(method = "both")+
+  shade_p_value(observed_f_statistic,
+                direction = "greater")
+```
+
+### Get the P-Value
+
+```{r}
+#| echo: true
+## calculate the p-value from the observed statistic
+
+p_value <- null_distribution %>% 
+  get_p_value(obs_stat = observed_f_statistic,
+              direction = "greater")
+p_value %>% 
+  gt()
+```
