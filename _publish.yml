@@ -1,0 +1,4 @@
+- source: one_way_ANOVA.qmd
+  quarto-pub:
+    - id: d32a680c-149d-4687-ac21-b39148616c2a
+      url: 'https://hbowley.quarto.pub/one-way-anova'

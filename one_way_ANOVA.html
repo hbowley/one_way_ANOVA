@@ -56,7 +56,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="one_way_ANOVA_files/libs/clipboard/clipboard.min.js"></script>
@@ -70,6 +89,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="one_way_ANOVA_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="one_way_ANOVA_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
 
@@ -81,12 +102,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#load-in-libraries" id="toc-load-in-libraries" class="nav-link active" data-scroll-target="#load-in-libraries">Load in Libraries</a></li>
+  <li><a href="#one-way-anova" id="toc-one-way-anova" class="nav-link active" data-scroll-target="#one-way-anova">One way ANOVA</a></li>
+  <li><a href="#assumptions" id="toc-assumptions" class="nav-link" data-scroll-target="#assumptions">Assumptions</a></li>
+  <li><a href="#hypothesis" id="toc-hypothesis" class="nav-link" data-scroll-target="#hypothesis">Hypothesis</a></li>
+  <li><a href="#installing-packages" id="toc-installing-packages" class="nav-link" data-scroll-target="#installing-packages">Installing Packages</a></li>
+  <li><a href="#load-in-libraries" id="toc-load-in-libraries" class="nav-link" data-scroll-target="#load-in-libraries">Load in Libraries</a></li>
+  <li><a href="#loading-in-the-data" id="toc-loading-in-the-data" class="nav-link" data-scroll-target="#loading-in-the-data">Loading in the data</a></li>
+  <li><a href="#headache-hypothesis" id="toc-headache-hypothesis" class="nav-link" data-scroll-target="#headache-hypothesis">Headache Hypothesis</a></li>
   <li><a href="#calculate-one-way-anova-using-base-r" id="toc-calculate-one-way-anova-using-base-r" class="nav-link" data-scroll-target="#calculate-one-way-anova-using-base-r">Calculate one way ANOVA using base R</a></li>
-  <li><a href="#visualize-the-anova" id="toc-visualize-the-anova" class="nav-link" data-scroll-target="#visualize-the-anova">Visualize the ANOVA</a></li>
+  <li><a href="#visualize-the-anova-using-a-boxplot" id="toc-visualize-the-anova-using-a-boxplot" class="nav-link" data-scroll-target="#visualize-the-anova-using-a-boxplot">Visualize the ANOVA using a boxplot</a></li>
   <li><a href="#calculate-the-observed-statistic" id="toc-calculate-the-observed-statistic" class="nav-link" data-scroll-target="#calculate-the-observed-statistic">Calculate the observed statistic</a></li>
   <li><a href="#calculate-the-null-distribution-simulation" id="toc-calculate-the-null-distribution-simulation" class="nav-link" data-scroll-target="#calculate-the-null-distribution-simulation">Calculate the Null Distribution Simulation</a></li>
-  <li><a href="#get-the-p-value" id="toc-get-the-p-value" class="nav-link" data-scroll-target="#get-the-p-value">Get the P-Value</a></li>
+  <li><a href="#get-the-p-value-for-the-randomization-based-empirical-f-distribution" id="toc-get-the-p-value-for-the-randomization-based-empirical-f-distribution" class="nav-link" data-scroll-target="#get-the-p-value-for-the-randomization-based-empirical-f-distribution">Get the P-Value for the randomization based empirical F distribution</a></li>
   </ul>
 </nav>
 </div>
@@ -116,43 +143,127 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
+<section id="one-way-anova" class="level3">
+<h3 class="anchored" data-anchor-id="one-way-anova">One way ANOVA</h3>
+<p>ANOVA: Statistical test that is typically used to analyze the difference between means of more than one group</p>
+<p>One-way ANOVA: - Uses one independent variable<br>
+- The independent variable should have at least 2 levels (or groups/categories)<br>
+- Used when one wants to test if the variations ( or different levels) of the independent variable have a significant effect on the dependent variable</p>
+</section>
+<section id="assumptions" class="level3">
+<h3 class="anchored" data-anchor-id="assumptions">Assumptions</h3>
+<ol type="1">
+<li>Independence of observation: No relationship between observation in each group or between the group themselves</li>
+<li>Normally-distributed response variable</li>
+<li>Homogeneity of variance</li>
+<li>Dependent variable should be continuous</li>
+<li>Independent variable should be categorical with at least 2 levels</li>
+</ol>
+</section>
+<section id="hypothesis" class="level3">
+<h3 class="anchored" data-anchor-id="hypothesis">Hypothesis</h3>
+<p>Null: There is no difference among group means</p>
+<p>Alternative: At least one group differs significantly from the overall mean of the dependent variable</p>
+</section>
+<section id="installing-packages" class="level3">
+<h3 class="anchored" data-anchor-id="installing-packages">Installing Packages</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("tidymodels")</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("datarium")</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("gt")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
 <section id="load-in-libraries" class="level3">
 <h3 class="anchored" data-anchor-id="load-in-libraries">Load in Libraries</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(datarium)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(datarium)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="loading-in-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="loading-in-the-data">Loading in the data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We will be using the headache data that is part of the datarium package</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(headache)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [72 × 5] (S3: tbl_df/tbl/data.frame)
+ $ id        : int [1:72] 1 2 3 4 5 6 7 8 9 10 ...
+ $ gender    : Factor w/ 2 levels "male","female": 1 1 1 1 1 1 1 1 1 1 ...
+ $ risk      : Factor w/ 2 levels "high","low": 2 2 2 2 2 2 2 2 2 2 ...
+ $ treatment : Factor w/ 3 levels "X","Y","Z": 1 1 1 1 1 1 2 2 2 2 ...
+ $ pain_score: num [1:72] 79.3 76.8 70.8 81.2 75.1 ...</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># For these examples we will be looking at the treatment and pain scale</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The categorical variable will be treatment while the independent variable while </span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># pain-score will be the dependent variable</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>For these examples we will be looking at the treatment and pain scale The categorical (independent) variable will be treatment while pain-score will be the dependent variable</p>
+</section>
+<section id="headache-hypothesis" class="level3">
+<h3 class="anchored" data-anchor-id="headache-hypothesis">Headache Hypothesis</h3>
+<ol type="1">
+<li>Null hypothesis: There is no difference is group means between treatment and pain scale</li>
+<li>Alternative Hypothesis: There is a significant difference between group means in at least 1 of the groups</li>
+</ol>
+<p><img src="formula1.png" class="img-fluid"></p>
+<p><img src="formula2.png" class="img-fluid"></p>
+<p><strong>SSR:</strong>&nbsp;regression sum of squares</p>
+<p><strong>SSE:</strong>&nbsp;error sum of squares</p>
+<p><strong>SST:</strong>&nbsp;total sum of squares (SST = SSR + SSE)</p>
+<p><strong>df<sub>r</sub>:</strong>&nbsp;regression degrees of freedom (df<sub>r</sub> = k-1)</p>
+<p><strong>df<sub>e</sub>:</strong>&nbsp;error degrees of freedom (df<sub>e</sub> = n-k)</p>
+<p><strong>df<sub>t</sub>:</strong>&nbsp;total degrees of freedom (df<sub>t</sub> = n-1)</p>
+<ul>
+<li><p><strong>k:</strong> total&nbsp;number of groups</p></li>
+<li><p><strong>n:</strong> total observations</p></li>
+</ul>
+<p><strong>MSR:</strong> regression mean square (MSR = SSR/df<sub>r</sub>)</p>
+<p><strong>MSE:</strong> error&nbsp;mean square (MSE = SSE/df<sub>e</sub>)</p>
+<p><strong>F:</strong> The F test statistic (F = MSR/MSE)</p>
+<p><strong>p:</strong> The p-value that corresponds to&nbsp;F<sub>dfr,&nbsp;dfe</sub></p>
+<p><span class="math display">\[
+F = \frac{variation\ among\ the\ sample\ means }{variation\ among\ individuals\ in\ the\ samples}
+\]</span></p>
+<ul>
+<li><p>F must be zero or positive</p></li>
+<li><p>F is zero when all sample means are identical</p></li>
+<li><p>F gets larger as means move further apart</p></li>
+</ul>
 </section>
 <section id="calculate-one-way-anova-using-base-r" class="level3">
 <h3 class="anchored" data-anchor-id="calculate-one-way-anova-using-base-r">Calculate one way ANOVA using base R</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Use AOV function to calculate </span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>anova <span class="ot">&lt;-</span><span class="fu">aov</span>(pain_score <span class="sc">~</span> treatment, <span class="at">data =</span> headache)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Tidy ANOVA output and create a gt table </span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>anova <span class="sc">%&gt;%</span> </span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Use AOV function to calculate </span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># aov is the base r fucntion for ANOVA </span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># fun(name of dependent variable ~ name independent variable, data = name of data set)</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>anova <span class="ot">&lt;-</span><span class="fu">aov</span>(pain_score <span class="sc">~</span> treatment, <span class="at">data =</span> headache)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Tidy ANOVA output and create a gt table </span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>anova <span class="sc">%&gt;%</span> </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div id="butpqbjogd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#butpqbjogd table {
+<div id="epzedsdkev" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#epzedsdkev table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#butpqbjogd thead, #butpqbjogd tbody, #butpqbjogd tfoot, #butpqbjogd tr, #butpqbjogd td, #butpqbjogd th {
+#epzedsdkev thead, #epzedsdkev tbody, #epzedsdkev tfoot, #epzedsdkev tr, #epzedsdkev td, #epzedsdkev th {
   border-style: none;
 }
 
-#butpqbjogd p {
+#epzedsdkev p {
   margin: 0;
   padding: 0;
 }
 
-#butpqbjogd .gt_table {
+#epzedsdkev .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -178,12 +289,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#butpqbjogd .gt_caption {
+#epzedsdkev .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#butpqbjogd .gt_title {
+#epzedsdkev .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -195,7 +306,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#butpqbjogd .gt_subtitle {
+#epzedsdkev .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -207,7 +318,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#butpqbjogd .gt_heading {
+#epzedsdkev .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -219,13 +330,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#butpqbjogd .gt_bottom_border {
+#epzedsdkev .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#butpqbjogd .gt_col_headings {
+#epzedsdkev .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -240,7 +351,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#butpqbjogd .gt_col_heading {
+#epzedsdkev .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -260,7 +371,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#butpqbjogd .gt_column_spanner_outer {
+#epzedsdkev .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -272,15 +383,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#butpqbjogd .gt_column_spanner_outer:first-child {
+#epzedsdkev .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#butpqbjogd .gt_column_spanner_outer:last-child {
+#epzedsdkev .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#butpqbjogd .gt_column_spanner {
+#epzedsdkev .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -292,11 +403,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#butpqbjogd .gt_spanner_row {
+#epzedsdkev .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#butpqbjogd .gt_group_heading {
+#epzedsdkev .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -322,7 +433,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#butpqbjogd .gt_empty_group_heading {
+#epzedsdkev .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -337,15 +448,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#butpqbjogd .gt_from_md > :first-child {
+#epzedsdkev .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#butpqbjogd .gt_from_md > :last-child {
+#epzedsdkev .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#butpqbjogd .gt_row {
+#epzedsdkev .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -364,7 +475,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#butpqbjogd .gt_stub {
+#epzedsdkev .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -377,7 +488,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#butpqbjogd .gt_stub_row_group {
+#epzedsdkev .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -391,15 +502,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#butpqbjogd .gt_row_group_first td {
+#epzedsdkev .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#butpqbjogd .gt_row_group_first th {
+#epzedsdkev .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#butpqbjogd .gt_summary_row {
+#epzedsdkev .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -409,16 +520,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#butpqbjogd .gt_first_summary_row {
+#epzedsdkev .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#butpqbjogd .gt_first_summary_row.thick {
+#epzedsdkev .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#butpqbjogd .gt_last_summary_row {
+#epzedsdkev .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -428,7 +539,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#butpqbjogd .gt_grand_summary_row {
+#epzedsdkev .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -438,7 +549,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#butpqbjogd .gt_first_grand_summary_row {
+#epzedsdkev .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -448,7 +559,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #D3D3D3;
 }
 
-#butpqbjogd .gt_last_grand_summary_row_top {
+#epzedsdkev .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -458,11 +569,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#butpqbjogd .gt_striped {
+#epzedsdkev .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#butpqbjogd .gt_table_body {
+#epzedsdkev .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -471,7 +582,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#butpqbjogd .gt_footnotes {
+#epzedsdkev .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -485,7 +596,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#butpqbjogd .gt_footnote {
+#epzedsdkev .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -494,7 +605,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#butpqbjogd .gt_sourcenotes {
+#epzedsdkev .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -508,7 +619,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#butpqbjogd .gt_sourcenote {
+#epzedsdkev .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -516,63 +627,63 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#butpqbjogd .gt_left {
+#epzedsdkev .gt_left {
   text-align: left;
 }
 
-#butpqbjogd .gt_center {
+#epzedsdkev .gt_center {
   text-align: center;
 }
 
-#butpqbjogd .gt_right {
+#epzedsdkev .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#butpqbjogd .gt_font_normal {
+#epzedsdkev .gt_font_normal {
   font-weight: normal;
 }
 
-#butpqbjogd .gt_font_bold {
+#epzedsdkev .gt_font_bold {
   font-weight: bold;
 }
 
-#butpqbjogd .gt_font_italic {
+#epzedsdkev .gt_font_italic {
   font-style: italic;
 }
 
-#butpqbjogd .gt_super {
+#epzedsdkev .gt_super {
   font-size: 65%;
 }
 
-#butpqbjogd .gt_footnote_marks {
+#epzedsdkev .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#butpqbjogd .gt_asterisk {
+#epzedsdkev .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#butpqbjogd .gt_indent_1 {
+#epzedsdkev .gt_indent_1 {
   text-indent: 5px;
 }
 
-#butpqbjogd .gt_indent_2 {
+#epzedsdkev .gt_indent_2 {
   text-indent: 10px;
 }
 
-#butpqbjogd .gt_indent_3 {
+#epzedsdkev .gt_indent_3 {
   text-indent: 15px;
 }
 
-#butpqbjogd .gt_indent_4 {
+#epzedsdkev .gt_indent_4 {
   text-indent: 20px;
 }
 
-#butpqbjogd .gt_indent_5 {
+#epzedsdkev .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -608,89 +719,49 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p>The p-value was found to be greater than 0.05, meaning that we failed to reject the null hypothesis</p>
+<p>Meaning there is no difference is group means between treatment and pain scale</p>
 </section>
-<section id="visualize-the-anova" class="level3">
-<h3 class="anchored" data-anchor-id="visualize-the-anova">Visualize the ANOVA</h3>
+<section id="visualize-the-anova-using-a-boxplot" class="level3">
+<h3 class="anchored" data-anchor-id="visualize-the-anova-using-a-boxplot">Visualize the ANOVA using a boxplot</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>headache <span class="sc">%&gt;%</span> </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(treatment, pain_score)) <span class="sc">+</span> </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>headache <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(treatment, pain_score)) <span class="sc">+</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="one_way_ANOVA_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<p><img src="one_way_ANOVA_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 <section id="calculate-the-observed-statistic" class="level3">
 <h3 class="anchored" data-anchor-id="calculate-the-observed-statistic">Calculate the observed statistic</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Calculate the observed statistic</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>observed_f_statistic <span class="ot">&lt;-</span> headache <span class="sc">%&gt;%</span> </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(pain_score <span class="sc">~</span> treatment) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"F"</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>observed_f_statistic</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Response: pain_score (numeric)
-Explanatory: treatment (factor)
-Null Hypothesis: independence
-# A tibble: 1 × 1
-   stat
-  &lt;dbl&gt;
-1  2.63</code></pre>
-</div>
-</div>
-</section>
-<section id="calculate-the-null-distribution-simulation" class="level3">
-<h3 class="anchored" data-anchor-id="calculate-the-null-distribution-simulation">Calculate the Null Distribution Simulation</h3>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">## generate the null distribution using randomization</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>null_distribution <span class="ot">&lt;-</span> headache <span class="sc">%&gt;%</span> </span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(pain_score <span class="sc">~</span> treatment) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"F"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>null_distribution <span class="sc">%&gt;%</span> </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visualize</span>(<span class="at">method =</span> <span class="st">"both"</span>)<span class="sc">+</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(observed_f_statistic,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">direction =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="one_way_ANOVA_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</section>
-<section id="get-the-p-value" class="level3">
-<h3 class="anchored" data-anchor-id="get-the-p-value">Get the P-Value</h3>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## calculate the p-value from the observed statistic</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>p_value <span class="ot">&lt;-</span> null_distribution <span class="sc">%&gt;%</span> </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_p_value</span>(<span class="at">obs_stat =</span> observed_f_statistic,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">direction =</span> <span class="st">"greater"</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>p_value <span class="sc">%&gt;%</span> </span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Calculate the observed statistic</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>observed_f_statistic <span class="ot">&lt;-</span> headache <span class="sc">%&gt;%</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(pain_score <span class="sc">~</span> treatment) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"F"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">gt</span>(observed_f_statistic)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
-<div id="krtdkyqnco" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#krtdkyqnco table {
+<div id="lyuytufdka" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#lyuytufdka table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#krtdkyqnco thead, #krtdkyqnco tbody, #krtdkyqnco tfoot, #krtdkyqnco tr, #krtdkyqnco td, #krtdkyqnco th {
+#lyuytufdka thead, #lyuytufdka tbody, #lyuytufdka tfoot, #lyuytufdka tr, #lyuytufdka td, #lyuytufdka th {
   border-style: none;
 }
 
-#krtdkyqnco p {
+#lyuytufdka p {
   margin: 0;
   padding: 0;
 }
 
-#krtdkyqnco .gt_table {
+#lyuytufdka .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -716,12 +787,12 @@ Null Hypothesis: independence
   border-left-color: #D3D3D3;
 }
 
-#krtdkyqnco .gt_caption {
+#lyuytufdka .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#krtdkyqnco .gt_title {
+#lyuytufdka .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -733,7 +804,7 @@ Null Hypothesis: independence
   border-bottom-width: 0;
 }
 
-#krtdkyqnco .gt_subtitle {
+#lyuytufdka .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -745,7 +816,7 @@ Null Hypothesis: independence
   border-top-width: 0;
 }
 
-#krtdkyqnco .gt_heading {
+#lyuytufdka .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -757,13 +828,13 @@ Null Hypothesis: independence
   border-right-color: #D3D3D3;
 }
 
-#krtdkyqnco .gt_bottom_border {
+#lyuytufdka .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#krtdkyqnco .gt_col_headings {
+#lyuytufdka .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -778,7 +849,7 @@ Null Hypothesis: independence
   border-right-color: #D3D3D3;
 }
 
-#krtdkyqnco .gt_col_heading {
+#lyuytufdka .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -798,7 +869,7 @@ Null Hypothesis: independence
   overflow-x: hidden;
 }
 
-#krtdkyqnco .gt_column_spanner_outer {
+#lyuytufdka .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -810,15 +881,15 @@ Null Hypothesis: independence
   padding-right: 4px;
 }
 
-#krtdkyqnco .gt_column_spanner_outer:first-child {
+#lyuytufdka .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#krtdkyqnco .gt_column_spanner_outer:last-child {
+#lyuytufdka .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#krtdkyqnco .gt_column_spanner {
+#lyuytufdka .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -830,11 +901,11 @@ Null Hypothesis: independence
   width: 100%;
 }
 
-#krtdkyqnco .gt_spanner_row {
+#lyuytufdka .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#krtdkyqnco .gt_group_heading {
+#lyuytufdka .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -860,7 +931,7 @@ Null Hypothesis: independence
   text-align: left;
 }
 
-#krtdkyqnco .gt_empty_group_heading {
+#lyuytufdka .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -875,15 +946,15 @@ Null Hypothesis: independence
   vertical-align: middle;
 }
 
-#krtdkyqnco .gt_from_md > :first-child {
+#lyuytufdka .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#krtdkyqnco .gt_from_md > :last-child {
+#lyuytufdka .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#krtdkyqnco .gt_row {
+#lyuytufdka .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -902,7 +973,7 @@ Null Hypothesis: independence
   overflow-x: hidden;
 }
 
-#krtdkyqnco .gt_stub {
+#lyuytufdka .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -915,7 +986,7 @@ Null Hypothesis: independence
   padding-right: 5px;
 }
 
-#krtdkyqnco .gt_stub_row_group {
+#lyuytufdka .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -929,15 +1000,15 @@ Null Hypothesis: independence
   vertical-align: top;
 }
 
-#krtdkyqnco .gt_row_group_first td {
+#lyuytufdka .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#krtdkyqnco .gt_row_group_first th {
+#lyuytufdka .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#krtdkyqnco .gt_summary_row {
+#lyuytufdka .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -947,16 +1018,16 @@ Null Hypothesis: independence
   padding-right: 5px;
 }
 
-#krtdkyqnco .gt_first_summary_row {
+#lyuytufdka .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#krtdkyqnco .gt_first_summary_row.thick {
+#lyuytufdka .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#krtdkyqnco .gt_last_summary_row {
+#lyuytufdka .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -966,7 +1037,7 @@ Null Hypothesis: independence
   border-bottom-color: #D3D3D3;
 }
 
-#krtdkyqnco .gt_grand_summary_row {
+#lyuytufdka .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -976,7 +1047,7 @@ Null Hypothesis: independence
   padding-right: 5px;
 }
 
-#krtdkyqnco .gt_first_grand_summary_row {
+#lyuytufdka .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -986,7 +1057,7 @@ Null Hypothesis: independence
   border-top-color: #D3D3D3;
 }
 
-#krtdkyqnco .gt_last_grand_summary_row_top {
+#lyuytufdka .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -996,11 +1067,11 @@ Null Hypothesis: independence
   border-bottom-color: #D3D3D3;
 }
 
-#krtdkyqnco .gt_striped {
+#lyuytufdka .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#krtdkyqnco .gt_table_body {
+#lyuytufdka .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1009,7 +1080,7 @@ Null Hypothesis: independence
   border-bottom-color: #D3D3D3;
 }
 
-#krtdkyqnco .gt_footnotes {
+#lyuytufdka .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1023,7 +1094,7 @@ Null Hypothesis: independence
   border-right-color: #D3D3D3;
 }
 
-#krtdkyqnco .gt_footnote {
+#lyuytufdka .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1032,7 +1103,7 @@ Null Hypothesis: independence
   padding-right: 5px;
 }
 
-#krtdkyqnco .gt_sourcenotes {
+#lyuytufdka .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1046,7 +1117,7 @@ Null Hypothesis: independence
   border-right-color: #D3D3D3;
 }
 
-#krtdkyqnco .gt_sourcenote {
+#lyuytufdka .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1054,63 +1125,556 @@ Null Hypothesis: independence
   padding-right: 5px;
 }
 
-#krtdkyqnco .gt_left {
+#lyuytufdka .gt_left {
   text-align: left;
 }
 
-#krtdkyqnco .gt_center {
+#lyuytufdka .gt_center {
   text-align: center;
 }
 
-#krtdkyqnco .gt_right {
+#lyuytufdka .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#krtdkyqnco .gt_font_normal {
+#lyuytufdka .gt_font_normal {
   font-weight: normal;
 }
 
-#krtdkyqnco .gt_font_bold {
+#lyuytufdka .gt_font_bold {
   font-weight: bold;
 }
 
-#krtdkyqnco .gt_font_italic {
+#lyuytufdka .gt_font_italic {
   font-style: italic;
 }
 
-#krtdkyqnco .gt_super {
+#lyuytufdka .gt_super {
   font-size: 65%;
 }
 
-#krtdkyqnco .gt_footnote_marks {
+#lyuytufdka .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#krtdkyqnco .gt_asterisk {
+#lyuytufdka .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#krtdkyqnco .gt_indent_1 {
+#lyuytufdka .gt_indent_1 {
   text-indent: 5px;
 }
 
-#krtdkyqnco .gt_indent_2 {
+#lyuytufdka .gt_indent_2 {
   text-indent: 10px;
 }
 
-#krtdkyqnco .gt_indent_3 {
+#lyuytufdka .gt_indent_3 {
   text-indent: 15px;
 }
 
-#krtdkyqnco .gt_indent_4 {
+#lyuytufdka .gt_indent_4 {
   text-indent: 20px;
 }
 
-#krtdkyqnco .gt_indent_5 {
+#lyuytufdka .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="stat">stat</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="stat" class="gt_row gt_right">2.630461</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+</div>
+</div>
+</section>
+<section id="calculate-the-null-distribution-simulation" class="level3">
+<h3 class="anchored" data-anchor-id="calculate-the-null-distribution-simulation">Calculate the Null Distribution Simulation</h3>
+<p>This creates a null distribution by randomly assigning a treatment group to each pain score and calculates the f statistic for each randomly generated group</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">## generate the null distribution using randomization</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>null_distribution <span class="ot">&lt;-</span> headache <span class="sc">%&gt;%</span> </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specify</span>(pain_score <span class="sc">~</span> treatment) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hypothesize</span>(<span class="at">null =</span> <span class="st">"independence"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate</span>(<span class="at">reps =</span> <span class="dv">1000</span>, <span class="at">type =</span> <span class="st">"permute"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate</span>(<span class="at">stat =</span> <span class="st">"F"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>null_distribution <span class="sc">%&gt;%</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visualize</span>(<span class="at">method =</span> <span class="st">"both"</span>)<span class="sc">+</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">shade_p_value</span>(observed_f_statistic,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">direction =</span> <span class="st">"greater"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="one_way_ANOVA_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="get-the-p-value-for-the-randomization-based-empirical-f-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="get-the-p-value-for-the-randomization-based-empirical-f-distribution">Get the P-Value for the randomization based empirical F distribution</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## calculate the p-value from the observed statistic</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>p_value <span class="ot">&lt;-</span> null_distribution <span class="sc">%&gt;%</span> </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_p_value</span>(</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">obs_stat =</span> observed_f_statistic,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">direction =</span> <span class="st">"greater"</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>p_value <span class="sc">%&gt;%</span> </span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div id="mfcmtcsuof" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#mfcmtcsuof table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#mfcmtcsuof thead, #mfcmtcsuof tbody, #mfcmtcsuof tfoot, #mfcmtcsuof tr, #mfcmtcsuof td, #mfcmtcsuof th {
+  border-style: none;
+}
+
+#mfcmtcsuof p {
+  margin: 0;
+  padding: 0;
+}
+
+#mfcmtcsuof .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#mfcmtcsuof .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#mfcmtcsuof .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#mfcmtcsuof .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#mfcmtcsuof .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#mfcmtcsuof .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mfcmtcsuof .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#mfcmtcsuof .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#mfcmtcsuof .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#mfcmtcsuof .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#mfcmtcsuof .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#mfcmtcsuof .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#mfcmtcsuof .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#mfcmtcsuof .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#mfcmtcsuof .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#mfcmtcsuof .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#mfcmtcsuof .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#mfcmtcsuof .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#mfcmtcsuof .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mfcmtcsuof .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#mfcmtcsuof .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#mfcmtcsuof .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#mfcmtcsuof .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mfcmtcsuof .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#mfcmtcsuof .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#mfcmtcsuof .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mfcmtcsuof .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mfcmtcsuof .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#mfcmtcsuof .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mfcmtcsuof .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#mfcmtcsuof .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mfcmtcsuof .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#mfcmtcsuof .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mfcmtcsuof .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#mfcmtcsuof .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mfcmtcsuof .gt_left {
+  text-align: left;
+}
+
+#mfcmtcsuof .gt_center {
+  text-align: center;
+}
+
+#mfcmtcsuof .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#mfcmtcsuof .gt_font_normal {
+  font-weight: normal;
+}
+
+#mfcmtcsuof .gt_font_bold {
+  font-weight: bold;
+}
+
+#mfcmtcsuof .gt_font_italic {
+  font-style: italic;
+}
+
+#mfcmtcsuof .gt_super {
+  font-size: 65%;
+}
+
+#mfcmtcsuof .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#mfcmtcsuof .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#mfcmtcsuof .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#mfcmtcsuof .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#mfcmtcsuof .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#mfcmtcsuof .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#mfcmtcsuof .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -1122,7 +1686,7 @@ Null Hypothesis: independence
     </tr>
   </thead>
   <tbody class="gt_table_body">
-    <tr><td headers="p_value" class="gt_row gt_right">0.074</td></tr>
+    <tr><td headers="p_value" class="gt_row gt_right">0.075</td></tr>
   </tbody>
   
   
@@ -1130,9 +1694,22 @@ Null Hypothesis: independence
 </div>
 </div>
 </div>
+<p>The P -value differs slightly from the true F distribution because it is an approximation.</p>
+<p>Based on the observations although we get a p-value greater than 0.05 it would be unlikely that there is no association between pain and treatment</p>
+
 </section>
 
-</main>
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-noauthor_one-way_2023" class="csl-entry" role="listitem">
+<span>“One-Way Analysis of Variance.”</span> 2023. <em>Wikipedia</em>. <a href="https://en.wikipedia.org/w/index.php?title=One-way_analysis_of_variance&amp;oldid=1144197980">https://en.wikipedia.org/w/index.php?title=One-way_analysis_of_variance&amp;oldid=1144197980</a>.
+</div>
+<div id="ref-noauthor_tidy_nodate" class="csl-entry" role="listitem">
+<span>“Tidy <span>ANOVA</span> (<span>Analysis</span> of <span>Variance</span>) with Infer.”</span> n.d. Accessed June 1, 2023. <a href="https://infer.tidymodels.org/articles/anova.html">https://infer.tidymodels.org/articles/anova.html</a>.
+</div>
+<div id="ref-zach_one-way_2018" class="csl-entry" role="listitem">
+Zach. 2018. <span>“One-<span>Way</span> <span>ANOVA</span>: <span>Definition</span>, <span>Formula</span>, and <span>Example</span>.”</span> <em>Statology</em>. <a href="https://www.statology.org/one-way-anova/">https://www.statology.org/one-way-anova/</a>.
+</div>
+</div></section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {

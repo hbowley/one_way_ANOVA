@@ -7,7 +7,44 @@ format: html
 toc: true
 editor: visual
 theme: lux
+bibliography: references.bib
+nocite: |
+ @*
 ---
+
+### One way ANOVA
+
+ANOVA: Statistical test that is typically used to analyze the difference between means of more than one group
+
+One-way ANOVA: - Uses one independent variable\
+- The independent variable should have at least 2 levels (or groups/categories)\
+- Used when one wants to test if the variations ( or different levels) of the independent variable have a significant effect on the dependent variable
+
+### Assumptions
+
+1.  Independence of observation: No relationship between observation in each group or between the group themselves
+2.  Normally-distributed response variable
+3.  Homogeneity of variance
+4.  Dependent variable should be continuous
+5.  Independent variable should be categorical with at least 2 levels
+
+### Hypothesis
+
+Null: There is no difference among group means
+
+Alternative: At least one group differs significantly from the overall mean of the dependent variable
+
+### Installing Packages
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+# install.packages("tidymodels")
+# install.packages("datarium")
+# install.packages("gt")
+
+```
 
 ### Load in Libraries
 
@@ -15,15 +52,83 @@ theme: lux
 #| echo: true
 #| message: false
 #| warning: false
+
+
 library(tidymodels)
 library(datarium)
 library(gt)
 ```
 
+### Loading in the data
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+# We will be using the headache data that is part of the datarium package
+
+str(headache)
+
+# For these examples we will be looking at the treatment and pain scale
+# The categorical variable will be treatment while the independent variable while 
+# pain-score will be the dependent variable
+
+
+```
+
+For these examples we will be looking at the treatment and pain scale The categorical (independent) variable will be treatment while pain-score will be the dependent variable
+
+### Headache Hypothesis
+
+1.  Null hypothesis: There is no difference is group means between treatment and pain scale
+2.  Alternative Hypothesis: There is a significant difference between group means in at least 1 of the groups
+
+![](formula1.png)
+
+![](formula2.png)
+
+**SSR:** regression sum of squares
+
+**SSE:** error sum of squares
+
+**SST:** total sum of squares (SST = SSR + SSE)
+
+**df~r~:** regression degrees of freedom (df~r~ = k-1)
+
+**df~e~:** error degrees of freedom (df~e~ = n-k)
+
+**df~t~:** total degrees of freedom (df~t~ = n-1)
+
+-   **k:** total number of groups
+
+-   **n:** total observations
+
+**MSR:** regression mean square (MSR = SSR/df~r~)
+
+**MSE:** error mean square (MSE = SSE/df~e~)
+
+**F:** The F test statistic (F = MSR/MSE)
+
+**p:** The p-value that corresponds to F~dfr,\ dfe~
+
+$$
+F = \frac{variation\ among\ the\ sample\ means }{variation\ among\ individuals\ in\ the\ samples}
+$$
+
+-   F must be zero or positive
+
+-   F is zero when all sample means are identical
+
+-   F gets larger as means move further apart
+
 ### Calculate one way ANOVA using base R
 
 ```{r}
 ## Use AOV function to calculate 
+# aov is the base r fucntion for ANOVA 
+# fun(name of dependent variable ~ name independent variable, data = name of data set)
+
 anova <-aov(pain_score ~ treatment, data = headache)
 
 ## Tidy ANOVA output and create a gt table 
@@ -32,7 +137,11 @@ anova %>%
   gt()
 ```
 
-### Visualize the ANOVA
+The p-value was found to be greater than 0.05, meaning that we failed to reject the null hypothesis
+
+Meaning there is no difference is group means between treatment and pain scale
+
+### Visualize the ANOVA using a boxplot
 
 ```{r}
 #| echo: true
@@ -41,7 +150,7 @@ headache %>%
   geom_boxplot()
 ```
 
-### Calculate the observed statistic 
+### Calculate the observed statistic
 
 ```{r}
 #| echo: true 
@@ -51,10 +160,12 @@ observed_f_statistic <- headache %>%
   hypothesize(null = "independence") %>% 
   calculate(stat = "F")
 
-observed_f_statistic
+gt(observed_f_statistic)
 ```
 
-### Calculate the Null Distribution Simulation 
+### Calculate the Null Distribution Simulation
+
+This creates a null distribution by randomly assigning a treatment group to each pain score and calculates the f statistic for each randomly generated group
 
 ```{r}
 #| echo: true
@@ -77,15 +188,21 @@ null_distribution %>%
                 direction = "greater")
 ```
 
-### Get the P-Value
+### Get the P-Value for the randomization based empirical F distribution
 
 ```{r}
 #| echo: true
 ## calculate the p-value from the observed statistic
 
 p_value <- null_distribution %>% 
-  get_p_value(obs_stat = observed_f_statistic,
-              direction = "greater")
+  get_p_value(
+    obs_stat = observed_f_statistic,
+    direction = "greater"
+    )
 p_value %>% 
   gt()
 ```
+
+The P -value differs slightly from the true F distribution because it is an approximation.
+
+Based on the observations although we get a p-value greater than 0.05 it would be unlikely that there is no association between pain and treatment
