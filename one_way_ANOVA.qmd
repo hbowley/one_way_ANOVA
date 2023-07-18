@@ -70,9 +70,7 @@ library(gt)
 
 str(headache)
 
-# For these examples we will be looking at the treatment and pain scale
-# The categorical variable will be treatment while the independent variable while 
-# pain-score will be the dependent variable
+
 
 
 ```
@@ -206,3 +204,22 @@ p_value %>%
 The P -value differs slightly from the true F distribution because it is an approximation.
 
 Based on the observations although we get a p-value greater than 0.05 it would be unlikely that there is no association between pain and treatment
+
+### Tukey HSD Test
+
+For pairwise comparisons between each treatment group
+
+```{r}
+#| echo: true
+
+Tukey <- TukeyHSD(anova, conf.level = .95)
+Tukey %>% 
+  tidy() %>% 
+  gt()
+
+plot(TukeyHSD(anova, conf.level = .95), las = 2)
+```
+
+-   This test shows that there were no significant difference between the groups (all p-values greater than 0.05)
+
+-   The confidence interval includes 0 suggesting no statistical difference between groups
