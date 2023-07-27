@@ -25,8 +25,7 @@ One-way ANOVA: - Uses one independent variable\
 1.  Independence of observation: No relationship between observation in each group or between the group themselves
 2.  Normally-distributed response variable
 3.  Homogeneity of variance
-4.  Dependent variable should be continuous
-5.  Independent variable should be categorical with at least 2 levels
+4.  Independent variable should be categorical with at least 2 levels
 
 ### Hypothesis
 
@@ -108,7 +107,7 @@ For these examples we will be looking at the treatment and pain scale The catego
 
 **F:** The F test statistic (F = MSR/MSE)
 
-**p:** The p-value that corresponds to F~dfr,\ dfe~
+**p:** The p-value that corresponds to F~dfr, dfe~
 
 $$
 F = \frac{variation\ among\ the\ sample\ means }{variation\ among\ individuals\ in\ the\ samples}
@@ -119,6 +118,16 @@ $$
 -   F is zero when all sample means are identical
 
 -   F gets larger as means move further apart
+
+### Visualize the distribution of dependent variable 
+
+-   As seen the dependant variable looks approximately normally distributed
+
+```{r}
+
+hist(headache$pain_score)
+
+```
 
 ### Calculate one way ANOVA using base R
 
